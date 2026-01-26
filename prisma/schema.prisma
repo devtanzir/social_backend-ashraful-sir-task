@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+
+model User {
+  id              Int      @id @default(autoincrement())
+  name            String
+  profileImage    String?
+  coverImage      String?
+  followersCount  Int      @default(0)
+  followingCount  Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  posts           Post[]
+
+  @@map("users")
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  content   String
+  image     String?
+  userId    Int
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("posts")
+}
