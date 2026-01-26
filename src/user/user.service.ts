@@ -1,38 +1,71 @@
-import { UpdateUserDto } from './dto/update-user-dto';
-import { CreateUserDto } from './dto/create-user-dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from './../prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user-dto';
+import { UpdateUserDto } from './dto/update-user-dto';
 
 @Injectable()
 export class UserService {
+  constructor(private readonly prisma: PrismaService) {}
 
-    constructor(private prisma: PrismaService){}
-    async findAll() {
-        return await this.prisma.user.findMany()
+  /**
+   * Get all users
+   * Simple read operation
+   * No try-catch needed (NestJS handles errors globally)
+   */
+  async findAll() {
+    return this.prisma.user.findMany();
+  }
+
+  /**
+   * Get single user by ID
+   * Throws 404 if user not found
+   */
+  async findOne(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
 
-    async findOne(id: number) {
-        return await this.prisma.user.findUnique({
-            where: {id: +id}
-        })
-    }
+    return user;
+  }
 
-    async create (createUserDto:CreateUserDto) {
-        return await this.prisma.user.create({
-            data: createUserDto
-        })
-    }
+  /**
+   * Create new user
+   * DTO validation already handled in controller
+   */
+  async create(createUserDto: CreateUserDto) {
+    return this.prisma.user.create({
+      data: createUserDto,
+    });
+  }
 
-    async update (id: number, updateUserDto:UpdateUserDto) {
-        return await this.prisma.user.update({
-            where: {id: +id},
-            data: updateUserDto
-        })
-    }
+  /**
+   * Update existing user
+   * First checks if user exists
+   */
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    // Check existence before update
+    await this.findOne(id);
 
-    async delete (id: number) {
-        return await this.prisma.user.delete({
-            where: {id: +id}
-        })
-    }
+    return this.prisma.user.update({
+      where: { id },
+      data: updateUserDto,
+    });
+  }
+
+  /**
+   * Delete user by ID
+   * Ensures user exists before delete
+   */
+  async delete(id: number) {
+    // Check existence before delete
+    await this.findOne(id);
+
+    return this.prisma.user.delete({
+      where: { id },
+    });
+  }
 }
