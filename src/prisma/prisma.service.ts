@@ -10,7 +10,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
             host: "localhost",
             port: 3306,
             user: "root",
-            database: "social_backend",
+            database: "social_backend_v2",
             connectionLimit: 5,
         })
     super({adapter});
