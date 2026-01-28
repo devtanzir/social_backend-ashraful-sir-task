@@ -31,6 +31,25 @@ export class UserService {
 
     return user;
   }
+  /**
+   * Get all posts for a specific user by ID
+   */
+  async findAllPost(userId: number) {
+  return this.prisma.post.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          profileImage: true,
+        },
+      },
+    },
+  });
+}
+
 
   /**
    * Create new user

@@ -26,6 +26,16 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
+    /**
+   * GET /user/:id/posts
+   * Returns all posts for a specific user by ID
+   * @Param id - user ID (auto-parsed as number by ParseIntPipe)
+   */
+  @Get(':id/posts')
+findAllPost(@Param('id', ParseIntPipe) userId: number) {
+  return this.userService.findAllPost(userId);
+}
+
   /**
    * POST /user
    * Creates a new user
